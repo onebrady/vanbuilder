@@ -26,7 +26,7 @@ const OptionCard = ({
   currentSelectedItem,
 }) => {
   const [currentStepArray, setCurrentStepArray] = React.useState([]);
-  console.log(currentSelectedItem);
+  // console.log(currentSelectedItem);
   // Get Group Count
   const groupCount = hyquery.reduce((sum, item) => {
     const countPerVanType = item.stepCategories.reduce(
@@ -116,7 +116,6 @@ const OptionCard = ({
 
             <Typography sx={{ fontSize: 14, paddingTop: "15px" }} gutterBottom>
               {category.name}
-              {console.log(category.optionGroups[0].description)}
             </Typography>
 
             {currentOptionGroups[currentGroupIndex].name && (

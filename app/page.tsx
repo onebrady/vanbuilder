@@ -10,6 +10,61 @@ import ViewOrder from "../components/ViewOrder";
 import StartOver from "../components/StartOver";
 import Tawk from "../components/Tawk";
 
+interface Image {
+  height: number;
+  width: number;
+  url: string;
+}
+
+interface Item {
+  id: string;
+  name: string;
+  defaultItem: boolean;
+  description: string;
+  image: Image;
+  laborHours: number;
+  price: number | null;
+  sku: string;
+  toolTip: string;
+}
+
+interface Option {
+  id: string;
+  name: string;
+  defaultItem: boolean | null;
+  description: string | null;
+  image: Image | null;
+  laborHours: number | null;
+  price: number | null;
+  sku: string | null;
+  toolTip: string | null;
+}
+
+interface OptionGroup {
+  description: string | null;
+  id: string;
+  name: string;
+  optionGroup: Option[];
+}
+
+interface StepCategory {
+  description: string | null;
+  id: string;
+  name: string;
+  optionGroups: OptionGroup[];
+}
+
+interface VanType {
+  basePrice: number;
+  description: string;
+  id: string;
+  name: string;
+  laborHours: number;
+  image: Image;
+  sku: string;
+  stepCategories: StepCategory[];
+}
+
 export default function Home() {
   const floorColorId = "clp7pxe2k7yb40bllal9wiy6o";
   const wireHarnessId = "clp90zqnh9e1n0an2la46jzuw";
@@ -22,43 +77,49 @@ export default function Home() {
   const trimKitId = "clpyep8g2tkmu0alqrky3v2hr";
   const installationId = "clpyew2c4tov30alqw8dqf4n0";
 
-  const [hyquery, setHyQuery] = useState([]);
+  const [hyquery, setHyQuery] = useState<VanType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [step, setStep] = useState("clp20yr1ac0q10an660ovlpjw");
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
-  const [floorOption, setFloorOption] = useState([]);
-  const [wiringHarness, setWiringHarness] = useState([]);
-  const [powerSystem, setPowerSystem] = useState([]);
-  const [ceilingPanel, setCeilingPanel] = useState([]);
-  const [ceilingLighting, setCeilingLighting] = useState([]);
-  const [ventalation, setVentalation] = useState([]);
-  const [walls, setWalls] = useState([]);
-  const [insulation, setInsulation] = useState([]);
-  const [trim, setTrim] = useState([]);
+  const [floorOption, setFloorOption] = useState<Item | null>(null);
+  const [wiringHarness, setWiringHarness] = useState<Item | null>(null);
+  const [powerSystem, setPowerSystem] = useState<Item | null>(null);
+  const [ceilingPanel, setCeilingPanel] = useState<Item | null>(null);
+  const [ceilingLighting, setCeilingLighting] = useState<Item | null>(null);
+  const [ventalation, setVentalation] = useState<Item | null>(null);
+  const [walls, setWalls] = useState<Item | null>(null);
+  const [insulation, setInsulation] = useState<Item | null>(null);
+  const [trim, setTrim] = useState<Item | null>(null);
   const [currentSelectedItem, setCurrentSelectedItem] = useState([]);
 
-  const [groupNamesFromChild, setGroupNamesFromChild] = useState([]);
+  const [groupNamesFromChild, setGroupNamesFromChild] = useState(0);
 
-  const handleGroupNames = (groupNames) => {
+  const handleGroupNames = (groupNames: number[]) => {
     setGroupNamesFromChild(groupNames.length);
+    console.log(hyquery);
   };
-  // console.log(groupNamesFromChild);
+  interface StepCategory {
+    name: string;
+    id: string;
+  }
+  const uniqueStepCategories = hyquery.reduce<StepCategory[]>(
+    (accumulator, vanType) => {
+      vanType.stepCategories.forEach((stepCategory: any) => {
+        const categoryExists = accumulator.some(
+          (category) => category.name === stepCategory.name
+        );
+        if (!categoryExists) {
+          accumulator.push({
+            name: stepCategory.name,
+            id: stepCategory.id,
+          });
+        }
+      });
+      return accumulator;
+    },
+    []
+  );
 
-  const uniqueStepCategories = hyquery.reduce((accumulator, vanType) => {
-    vanType.stepCategories.forEach((stepCategory) => {
-      const categoryExists = accumulator.some(
-        (category) => category.name === stepCategory.name
-      );
-      if (!categoryExists) {
-        accumulator.push({
-          name: stepCategory.name,
-          id: stepCategory.id,
-        });
-      }
-    });
-    return accumulator;
-  }, []);
-  // console.log(getNextId(uniqueStepCategories, step));
   const fullQuery = async () => {
     const result = await getQuery();
     setHyQuery(result?.vanTypes);
@@ -97,16 +158,16 @@ export default function Home() {
     }
   };
 
-  function getNextId(items, currentId) {
-    const currentIndex = items.findIndex((item) => item.id === currentId);
+  function getNextId(items: any, currentId: any) {
+    const currentIndex = items.findIndex((item: any) => item.id === currentId);
     if (currentIndex === -1 || currentIndex === items.length - 1) {
       return currentId;
     }
     return items[currentIndex + 1].id;
   }
 
-  function getPreviousId(items, currentId) {
-    const currentIndex = items.findIndex((item) => item.id === currentId);
+  function getPreviousId(items: any, currentId: any) {
+    const currentIndex = items.findIndex((item: any) => item.id === currentId);
     if (currentIndex <= 0) {
       return currentId;
     }
@@ -166,7 +227,7 @@ export default function Home() {
   };
 
   const allOptionGroups = hyquery.reduce((accumulator, vanType) => {
-    vanType.stepCategories.forEach((stepCategory: string) => {
+    vanType.stepCategories.forEach((stepCategory: any) => {
       accumulator = accumulator.concat(stepCategory.optionGroups);
     });
     return accumulator;
@@ -174,36 +235,76 @@ export default function Home() {
 
   function loadDefaults() {
     let stepCheck = localStorage.getItem("step");
-    let floorStep = JSON.parse(localStorage.getItem("lsFloorOption"));
+    const floorStepRaw = localStorage.getItem("lsFloorOption");
+    let floorStep;
+    if (floorStepRaw !== null) {
+      floorStep = JSON.parse(floorStepRaw);
+    }
+
     let floorDefault = getDefaultItem(allOptionGroups, floorColorId);
 
-    let localWireHarness = JSON.parse(localStorage.getItem("lsWiringHarness"));
+    const WireHarnessRaw = localStorage.getItem("lsWiringHarness");
+    let localWireHarness;
+    if (WireHarnessRaw !== null) {
+      localWireHarness = JSON.parse(WireHarnessRaw);
+    }
+
     let WireHarnessDefault = getDefaultItem(allOptionGroups, wireHarnessId);
 
-    let localPowerSystem = JSON.parse(localStorage.getItem("lsPowerSystem"));
+    const powerSystemRaw = localStorage.getItem("lsPowerSystem");
+    let localPowerSystem;
+    if (powerSystemRaw !== null) {
+      localWireHarness = JSON.parse(powerSystemRaw);
+    }
+
     let PowerSystemDefault = getDefaultItem(allOptionGroups, powerSystemId);
 
-    let localCeilingPanel = JSON.parse(localStorage.getItem("lsCeilingPanel"));
+    const ceilingPanelRaw = localStorage.getItem("lsCeilingPanel");
+    let localCeilingPanel;
+    if (ceilingPanelRaw !== null) {
+      localCeilingPanel = JSON.parse(ceilingPanelRaw);
+    }
     let CeilingPanelDefault = getDefaultItem(allOptionGroups, ceilingPanelId);
 
-    let localVentilation = JSON.parse(localStorage.getItem("lsVentilation"));
+    const ventilationRaw = localStorage.getItem("lsVentilation");
+    let localVentilation;
+    if (ventilationRaw !== null) {
+      localVentilation = JSON.parse(ventilationRaw);
+    }
+
     let VentilationDefault = getDefaultItem(allOptionGroups, ventilationId);
 
-    let localCeilingLighting = JSON.parse(
-      localStorage.getItem("lsCeilingLighting")
-    );
+    const ceilingLightingRaw = localStorage.getItem("lsCeilingLighting");
+    let localCeilingLighting;
+    if (ceilingLightingRaw !== null) {
+      localCeilingLighting = JSON.parse(ceilingLightingRaw);
+    }
+
     let CeilingLightingDefault = getDefaultItem(
       allOptionGroups,
       CeilingLightingId
     );
 
-    let localWalls = JSON.parse(localStorage.getItem("lsWalls"));
+    const wallsRaw = localStorage.getItem("lsWalls");
+    let localWalls;
+    if (wallsRaw !== null) {
+      localCeilingLighting = JSON.parse(wallsRaw);
+    }
+
     let WallsDefault = getDefaultItem(allOptionGroups, wallPanelsId);
 
-    let localInsulation = JSON.parse(localStorage.getItem("lsInsulation"));
+    const insulationRaw = localStorage.getItem("lsInsulation");
+    let localInsulation;
+    if (insulationRaw !== null) {
+      localInsulation = JSON.parse(insulationRaw);
+    }
     let InsulationDefault = getDefaultItem(allOptionGroups, wallInsulationId);
 
-    let localTrim = JSON.parse(localStorage.getItem("lsTrim"));
+    const trimRaw = localStorage.getItem("lsTrim");
+    let localTrim;
+    if (trimRaw !== null) {
+      localTrim = JSON.parse(trimRaw);
+    }
     let TrimDefault = getDefaultItem(allOptionGroups, trimKitId);
     if (stepCheck) {
       setStep(stepCheck);
@@ -228,15 +329,17 @@ export default function Home() {
   }, [hyquery]);
 
   function getFirstImageUrl(hyquery: any, id: string) {
-    const item = hyquery.find((item) => item.id === id);
+    const item = hyquery.find((item: any) => item.id === id);
     return item && item.image ? item.image.url : null;
   }
   const vanBaseImage = getFirstImageUrl(hyquery, "clp20wntffhgf0blutxpdtbcd");
 
-  function getDefaultItem(data, optionGroupId) {
-    const optionGroup = data.find((group) => group.id === optionGroupId);
+  function getDefaultItem(data: any, optionGroupId: string) {
+    const optionGroup = data.find((group: any) => group.id === optionGroupId);
     if (optionGroup && optionGroup.optionGroup) {
-      return optionGroup.optionGroup.find((item) => item.defaultItem === true);
+      return optionGroup.optionGroup.find(
+        (item: any) => item.defaultItem === true
+      );
     }
     return null;
   }
