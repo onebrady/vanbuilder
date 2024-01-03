@@ -1,113 +1,318 @@
-import Image from 'next/image'
+"use client";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import OverlayImages from "../components/OverlayImages";
+import BasicModal from "../components/BasicModal";
+import Steps from "../components/Steps";
+import OptionCard from "../components/OptionCard";
+import { getQuery } from "../hygraph";
+import ViewOrder from "../components/ViewOrder";
+import StartOver from "../components/StartOver";
+import Tawk from "../components/Tawk";
 
 export default function Home() {
+  const floorColorId = "clp7pxe2k7yb40bllal9wiy6o";
+  const wireHarnessId = "clp90zqnh9e1n0an2la46jzuw";
+  const powerSystemId = "clp9116mq4ee10bn4136zm1dr";
+  const ceilingPanelId = "clpoem3ar6f4g0bn4ke845cmn";
+  const ventilationId = "clppvbaocuewr0bn4icgwgoev";
+  const CeilingLightingId = "clpofb856gtez0blk3ha9r36s";
+  const wallPanelsId = "clpt5vqdy44j80blrpfgh2oat";
+  const wallInsulationId = "clpwz888h6nef0amzkz46l9xk";
+  const trimKitId = "clpyep8g2tkmu0alqrky3v2hr";
+  const installationId = "clpyew2c4tov30alqw8dqf4n0";
+
+  const [hyquery, setHyQuery] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [step, setStep] = useState("clp20yr1ac0q10an660ovlpjw");
+  const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
+  const [floorOption, setFloorOption] = useState([]);
+  const [wiringHarness, setWiringHarness] = useState([]);
+  const [powerSystem, setPowerSystem] = useState([]);
+  const [ceilingPanel, setCeilingPanel] = useState([]);
+  const [ceilingLighting, setCeilingLighting] = useState([]);
+  const [ventalation, setVentalation] = useState([]);
+  const [walls, setWalls] = useState([]);
+  const [insulation, setInsulation] = useState([]);
+  const [trim, setTrim] = useState([]);
+  const [currentSelectedItem, setCurrentSelectedItem] = useState([]);
+
+  const [groupNamesFromChild, setGroupNamesFromChild] = useState([]);
+
+  const handleGroupNames = (groupNames) => {
+    setGroupNamesFromChild(groupNames.length);
+  };
+  // console.log(groupNamesFromChild);
+
+  const uniqueStepCategories = hyquery.reduce((accumulator, vanType) => {
+    vanType.stepCategories.forEach((stepCategory) => {
+      const categoryExists = accumulator.some(
+        (category) => category.name === stepCategory.name
+      );
+      if (!categoryExists) {
+        accumulator.push({
+          name: stepCategory.name,
+          id: stepCategory.id,
+        });
+      }
+    });
+    return accumulator;
+  }, []);
+  // console.log(getNextId(uniqueStepCategories, step));
+  const fullQuery = async () => {
+    const result = await getQuery();
+    setHyQuery(result?.vanTypes);
+  };
+
+  const handleModalChange = (isOpen: boolean) => {
+    setIsModalOpen(isOpen);
+  };
+
+  const handleStepChange = (id: string) => {
+    setStep(id);
+    setCurrentGroupIndex(0);
+    localStorage.setItem("step", id);
+  };
+  const showNextGroup = () => {
+    if (currentGroupIndex === groupNamesFromChild - 1) {
+      let nextStep = getNextId(uniqueStepCategories, step);
+      setStep(nextStep);
+      setCurrentGroupIndex(0);
+      localStorage.setItem("step", nextStep);
+    } else {
+      setCurrentGroupIndex((prevIndex) => prevIndex + 1);
+    }
+  };
+
+  // Function to show previous group
+  const showPreviousGroup = () => {
+    if (currentGroupIndex === 0) {
+      let previousStep = getPreviousId(uniqueStepCategories, step);
+      setStep(previousStep);
+      localStorage.setItem("step", previousStep);
+    } else {
+      setCurrentGroupIndex((prevIndex) =>
+        prevIndex > 0 ? prevIndex - 1 : prevIndex
+      );
+    }
+  };
+
+  function getNextId(items, currentId) {
+    const currentIndex = items.findIndex((item) => item.id === currentId);
+    if (currentIndex === -1 || currentIndex === items.length - 1) {
+      return currentId;
+    }
+    return items[currentIndex + 1].id;
+  }
+
+  function getPreviousId(items, currentId) {
+    const currentIndex = items.findIndex((item) => item.id === currentId);
+    if (currentIndex <= 0) {
+      return currentId;
+    }
+    return items[currentIndex - 1].id;
+  }
+
+  const handleSelectItem = (item: any, itemStep: string) => {
+    let optGroup = itemStep;
+    //   console.log(optGroup);
+    switch (optGroup) {
+      case "clp7pxe2k7yb40bllal9wiy6o":
+        setFloorOption(item);
+        setCurrentSelectedItem(item);
+        localStorage.setItem("lsFloorOption", JSON.stringify(item));
+        break;
+      case "clp90zqnh9e1n0an2la46jzuw":
+        setWiringHarness(item);
+        setCurrentSelectedItem(item);
+        localStorage.setItem("lsWiringHarness", JSON.stringify(item));
+        break;
+      case "clp9116mq4ee10bn4136zm1dr":
+        setPowerSystem(item);
+        setCurrentSelectedItem(item);
+        localStorage.setItem("lsPowerSystem", JSON.stringify(item));
+        break;
+      case "clpoem3ar6f4g0bn4ke845cmn":
+        setCeilingPanel(item);
+        setCurrentSelectedItem(item);
+        localStorage.setItem("lsCeilingPanel", JSON.stringify(item));
+        break;
+      case "clpofb856gtez0blk3ha9r36s":
+        setCeilingLighting(item);
+        setCurrentSelectedItem(item);
+        localStorage.setItem("lsCeilingLighting", JSON.stringify(item));
+        break;
+      case "clppvbaocuewr0bn4icgwgoev":
+        setCeilingLighting(item);
+        setCurrentSelectedItem(item);
+        localStorage.setItem("lsVentilation", JSON.stringify(item));
+        break;
+      case "clpt5vqdy44j80blrpfgh2oat":
+        setWalls(item);
+        setCurrentSelectedItem(item);
+        localStorage.setItem("lsWalls", JSON.stringify(item));
+        break;
+      case "clpwz888h6nef0amzkz46l9xk":
+        setInsulation(item);
+        setCurrentSelectedItem(item);
+        localStorage.setItem("lsInsulation", JSON.stringify(item));
+        break;
+      case "clpyep8g2tkmu0alqrky3v2hr":
+        setTrim(item);
+        setCurrentSelectedItem(item);
+        localStorage.setItem("lsTrim", JSON.stringify(item));
+        break;
+    }
+  };
+
+  const allOptionGroups = hyquery.reduce((accumulator, vanType) => {
+    vanType.stepCategories.forEach((stepCategory: string) => {
+      accumulator = accumulator.concat(stepCategory.optionGroups);
+    });
+    return accumulator;
+  }, []);
+
+  function loadDefaults() {
+    let stepCheck = localStorage.getItem("step");
+    let floorStep = JSON.parse(localStorage.getItem("lsFloorOption"));
+    let floorDefault = getDefaultItem(allOptionGroups, floorColorId);
+
+    let localWireHarness = JSON.parse(localStorage.getItem("lsWiringHarness"));
+    let WireHarnessDefault = getDefaultItem(allOptionGroups, wireHarnessId);
+
+    let localPowerSystem = JSON.parse(localStorage.getItem("lsPowerSystem"));
+    let PowerSystemDefault = getDefaultItem(allOptionGroups, powerSystemId);
+
+    let localCeilingPanel = JSON.parse(localStorage.getItem("lsCeilingPanel"));
+    let CeilingPanelDefault = getDefaultItem(allOptionGroups, ceilingPanelId);
+
+    let localVentilation = JSON.parse(localStorage.getItem("lsVentilation"));
+    let VentilationDefault = getDefaultItem(allOptionGroups, ventilationId);
+
+    let localCeilingLighting = JSON.parse(
+      localStorage.getItem("lsCeilingLighting")
+    );
+    let CeilingLightingDefault = getDefaultItem(
+      allOptionGroups,
+      CeilingLightingId
+    );
+
+    let localWalls = JSON.parse(localStorage.getItem("lsWalls"));
+    let WallsDefault = getDefaultItem(allOptionGroups, wallPanelsId);
+
+    let localInsulation = JSON.parse(localStorage.getItem("lsInsulation"));
+    let InsulationDefault = getDefaultItem(allOptionGroups, wallInsulationId);
+
+    let localTrim = JSON.parse(localStorage.getItem("lsTrim"));
+    let TrimDefault = getDefaultItem(allOptionGroups, trimKitId);
+    if (stepCheck) {
+      setStep(stepCheck);
+    }
+    setFloorOption(floorStep || floorDefault);
+    setWiringHarness(localWireHarness || WireHarnessDefault);
+    setPowerSystem(localPowerSystem || PowerSystemDefault);
+    setCeilingPanel(localCeilingPanel || CeilingPanelDefault);
+    setCeilingLighting(localCeilingLighting || CeilingLightingDefault);
+    setVentalation(localVentilation || VentilationDefault);
+    setWalls(localWalls || WallsDefault);
+    setInsulation(localInsulation || InsulationDefault);
+    setTrim(localTrim || TrimDefault);
+  }
+
+  useEffect(() => {
+    fullQuery();
+  }, []);
+
+  useEffect(() => {
+    loadDefaults();
+  }, [hyquery]);
+
+  function getFirstImageUrl(hyquery: any, id: string) {
+    const item = hyquery.find((item) => item.id === id);
+    return item && item.image ? item.image.url : null;
+  }
+  const vanBaseImage = getFirstImageUrl(hyquery, "clp20wntffhgf0blutxpdtbcd");
+
+  function getDefaultItem(data, optionGroupId) {
+    const optionGroup = data.find((group) => group.id === optionGroupId);
+    if (optionGroup && optionGroup.optionGroup) {
+      return optionGroup.optionGroup.find((item) => item.defaultItem === true);
+    }
+    return null;
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
+    <main className="flex min-h-screen flex-col flex-wrap items-center justify-between">
+      <div>
         <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+          className="main-bg"
+          src="/SVB_170_Backplate_v01_0067.jpg"
+          alt=""
+          width={1920}
+          height={1080}
         />
+        {hyquery.length > 0 && !isModalOpen && vanBaseImage && (
+          <>
+            <OverlayImages vanimage={vanBaseImage} />
+            {floorOption?.image && (
+              <OverlayImages vanimage={floorOption.image?.url} />
+            )}
+            {wiringHarness?.image && (
+              <OverlayImages vanimage={wiringHarness.image?.url} />
+            )}
+            {insulation?.image && (
+              <OverlayImages vanimage={insulation.image?.url} />
+            )}
+            {ceilingPanel?.image && (
+              <OverlayImages vanimage={ceilingPanel.image?.url} />
+            )}
+
+            {ceilingLighting?.image && (
+              <OverlayImages vanimage={ceilingLighting.image?.url} />
+            )}
+            {ventalation?.image && (
+              <OverlayImages vanimage={ventalation.image?.url} />
+            )}
+
+            {walls?.image && <OverlayImages vanimage={walls.image?.url} />}
+
+            {trim?.image && <OverlayImages vanimage={trim.image?.url} />}
+            {powerSystem?.image && (
+              <OverlayImages vanimage={powerSystem.image?.url} />
+            )}
+          </>
+        )}
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className="content-overlay">
+        {hyquery.length > 0 && !isModalOpen && (
+          <>
+            <OptionCard
+              showNextGroup={showNextGroup}
+              showPreviousGroup={showPreviousGroup}
+              currentGroupIndex={currentGroupIndex}
+              step={step}
+              hyquery={hyquery}
+              onSelectItem={handleSelectItem}
+              onGroupNamesChange={handleGroupNames}
+              currentSelectedItem={currentSelectedItem}
+            />
+            <Steps
+              onstepChange={handleStepChange}
+              step={step}
+              hyquery={hyquery}
+            />
+            <ViewOrder />
+            <StartOver />
+          </>
+        )}
       </div>
+      <BasicModal
+        title="A NOTE ON LEAD TIMES"
+        subtitle="While our Interior Systems currently ship in 4-6 weeks, certain items such as mattresses, bamboo paneling and third party products may have longer lead times. Please inquire with your Customer Service Rep by emailing info@adventurewagon.com or calling 503-427-0140 to get an accurate lead time on your entire order."
+        open={isModalOpen}
+        onOpenChange={handleModalChange}
+      />
+      <Tawk />
     </main>
-  )
+  );
 }

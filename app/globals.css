@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -24,4 +24,119 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+.main-bg {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.modalIcon {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+.content-overlay {
+  position: "absolute";
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.top-50 {
+  z-index: 50;
+}
+.bottom-steps {
+  bottom: 15px;
+  position: absolute;
+}
+.MuiPaper-root {
+  position: relative;
+  z-index: 999;
+}
+.MuiToolTip-popper {
+  position: relative;
+  z-index: 9999;
+}
+.card-buttons {
+  display: flex;
+  margin-top: 25px;
+  margin-bottom: 0px;
+  justify-content: flex-end;
+}
+.card-buttons button svg {
+  width: 2em;
+  height: 2em;
+}
+.stepper-top {
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+}
+.stepper-top .MuiStepLabel-label {
+  color: #fff !important;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 3px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.stepper-top .activestep .MuiStepLabel-label {
+  color: #fff !important;
+  background-color: #1976d293;
+}
+.stepper-top .Mui-completed .MuiStepLabel-label {
+  background-color: #1976d2;
+}
+.optionCard {
+  top: 75px;
+}
+.card-buttons button:not(.Mui-disabled) svg {
+  fill: #1976d2;
+}
+.startOver {
+  position: absolute;
+  bottom: 0;
+  right: 115px;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  cursor: pointer;
+  z-index: 999;
+  border-radius: 5px 5px 0 0;
+}
+.viewOrder {
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  background-color: #fff;
+  min-width: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 45px;
+  cursor: pointer;
+  z-index: 999;
+  border-radius: 5px 5px 0 0;
+}
+.viewOrder h1 {
+  padding-left: 6px;
+}
+.MuiStepLabel-iconContainer.Mui-completed {
+  position: relative;
+}
+.MuiStepLabel-iconContainer.Mui-completed::after {
+  content: "";
+  position: absolute;
+  background-color: #fff;
+  width: 20px;
+  height: 20px;
+  top: 2px;
+  z-index: -1;
+  border-radius: 50%;
+  left: 2px;
 }
