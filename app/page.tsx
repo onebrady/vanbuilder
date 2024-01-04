@@ -90,13 +90,11 @@ export default function Home() {
   const [walls, setWalls] = useState<Item | null>(null);
   const [insulation, setInsulation] = useState<Item | null>(null);
   const [trim, setTrim] = useState<Item | null>(null);
-  const [currentSelectedItem, setCurrentSelectedItem] = useState([]);
 
   const [groupNamesFromChild, setGroupNamesFromChild] = useState(0);
 
   const handleGroupNames = (groupNames: number[]) => {
     setGroupNamesFromChild(groupNames.length);
-    console.log(hyquery);
   };
   interface StepCategory {
     name: string;
@@ -180,47 +178,38 @@ export default function Home() {
     switch (optGroup) {
       case "clp7pxe2k7yb40bllal9wiy6o":
         setFloorOption(item);
-        setCurrentSelectedItem(item);
         localStorage.setItem("lsFloorOption", JSON.stringify(item));
         break;
       case "clp90zqnh9e1n0an2la46jzuw":
         setWiringHarness(item);
-        setCurrentSelectedItem(item);
         localStorage.setItem("lsWiringHarness", JSON.stringify(item));
         break;
       case "clp9116mq4ee10bn4136zm1dr":
         setPowerSystem(item);
-        setCurrentSelectedItem(item);
         localStorage.setItem("lsPowerSystem", JSON.stringify(item));
         break;
       case "clpoem3ar6f4g0bn4ke845cmn":
         setCeilingPanel(item);
-        setCurrentSelectedItem(item);
         localStorage.setItem("lsCeilingPanel", JSON.stringify(item));
         break;
       case "clpofb856gtez0blk3ha9r36s":
         setCeilingLighting(item);
-        setCurrentSelectedItem(item);
         localStorage.setItem("lsCeilingLighting", JSON.stringify(item));
         break;
       case "clppvbaocuewr0bn4icgwgoev":
         setCeilingLighting(item);
-        setCurrentSelectedItem(item);
         localStorage.setItem("lsVentilation", JSON.stringify(item));
         break;
       case "clpt5vqdy44j80blrpfgh2oat":
         setWalls(item);
-        setCurrentSelectedItem(item);
         localStorage.setItem("lsWalls", JSON.stringify(item));
         break;
       case "clpwz888h6nef0amzkz46l9xk":
         setInsulation(item);
-        setCurrentSelectedItem(item);
         localStorage.setItem("lsInsulation", JSON.stringify(item));
         break;
       case "clpyep8g2tkmu0alqrky3v2hr":
         setTrim(item);
-        setCurrentSelectedItem(item);
         localStorage.setItem("lsTrim", JSON.stringify(item));
         break;
     }
@@ -397,7 +386,15 @@ export default function Home() {
               hyquery={hyquery}
               onSelectItem={handleSelectItem}
               onGroupNamesChange={handleGroupNames}
-              currentSelectedItem={currentSelectedItem}
+              floorOption={floorOption}
+              wiringHarness={wiringHarness}
+              powerSystem={powerSystem}
+              ceilingPanel={ceilingPanel}
+              ceilingLighting={ceilingLighting}
+              ventalation={ventalation}
+              walls={walls}
+              insulation={insulation}
+              trim={trim}
             />
             <Steps
               onstepChange={handleStepChange}
