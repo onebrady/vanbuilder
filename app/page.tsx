@@ -197,7 +197,7 @@ export default function Home() {
         localStorage.setItem("lsCeilingLighting", JSON.stringify(item));
         break;
       case "clppvbaocuewr0bn4icgwgoev":
-        setCeilingLighting(item);
+        setVentalation(item);
         localStorage.setItem("lsVentilation", JSON.stringify(item));
         break;
       case "clpt5vqdy44j80blrpfgh2oat":
@@ -358,12 +358,11 @@ export default function Home() {
             {ceilingPanel?.image && (
               <OverlayImages vanimage={ceilingPanel.image?.url} />
             )}
-
-            {ceilingLighting?.image && (
-              <OverlayImages vanimage={ceilingLighting.image?.url} />
-            )}
             {ventalation?.image && (
               <OverlayImages vanimage={ventalation.image?.url} />
+            )}
+            {ceilingLighting?.image && (
+              <OverlayImages vanimage={ceilingLighting.image?.url} />
             )}
 
             {walls?.image && <OverlayImages vanimage={walls.image?.url} />}
