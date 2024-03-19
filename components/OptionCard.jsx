@@ -32,6 +32,7 @@ const OptionCard = ({
   walls,
   insulation,
   trim,
+  window,
 }) => {
   const [currentStepArray, setCurrentStepArray] = React.useState([]);
   const [currentSelectedItem, setCurrentSelectedItem] = React.useState([]);
@@ -91,6 +92,9 @@ const OptionCard = ({
       case "clpyep8g2tkmu0alqrky3v2hr":
         setCurrentSelectedItem(trim);
         break;
+      case "cltykzi9rccus07lie30627uv":
+        setCurrentSelectedItem(window);
+        break;
     }
   }, [
     currentOptionGroups,
@@ -104,6 +108,7 @@ const OptionCard = ({
     walls,
     insulation,
     trim,
+    window,
   ]);
 
   React.useEffect(() => {

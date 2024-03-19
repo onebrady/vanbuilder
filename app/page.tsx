@@ -76,6 +76,7 @@ export default function Home() {
   const wallInsulationId = "clpwz888h6nef0amzkz46l9xk";
   const trimKitId = "clpyep8g2tkmu0alqrky3v2hr";
   const installationId = "clpyew2c4tov30alqw8dqf4n0";
+  const windowId = "cltykzi9rccus07lie30627uv";
 
   const [hyquery, setHyQuery] = useState<VanType[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(true);
@@ -90,6 +91,7 @@ export default function Home() {
   const [walls, setWalls] = useState<Item | null>(null);
   const [insulation, setInsulation] = useState<Item | null>(null);
   const [trim, setTrim] = useState<Item | null>(null);
+  const [window, setWindow] = useState<Item | null>(null);
 
   const [groupNamesFromChild, setGroupNamesFromChild] = useState(0);
 
@@ -212,6 +214,10 @@ export default function Home() {
         setTrim(item);
         localStorage.setItem("lsTrim", JSON.stringify(item));
         break;
+      case "cltykzi9rccus07lie30627uv":
+        setWindow(item);
+        localStorage.setItem("lsWindow", JSON.stringify(item));
+        break;
     }
   };
 
@@ -295,6 +301,14 @@ export default function Home() {
       localTrim = JSON.parse(trimRaw);
     }
     let TrimDefault = getDefaultItem(allOptionGroups, trimKitId);
+
+    const windowRaw = localStorage.getItem("lsWindow");
+    let localWindow;
+    if (windowRaw !== null) {
+      localWindow = JSON.parse(windowRaw);
+    }
+    let WindowDefault = getDefaultItem(allOptionGroups, windowId);
+
     if (stepCheck) {
       setStep(stepCheck);
     }
@@ -307,6 +321,7 @@ export default function Home() {
     setWalls(localWalls || WallsDefault);
     setInsulation(localInsulation || InsulationDefault);
     setTrim(localTrim || TrimDefault);
+    setWindow(localWindow || WindowDefault);
   }
 
   useEffect(() => {
@@ -371,6 +386,7 @@ export default function Home() {
             {powerSystem?.image && (
               <OverlayImages vanimage={powerSystem.image?.url} />
             )}
+            {window?.image && <OverlayImages vanimage={window.image?.url} />}
           </>
         )}
       </div>
@@ -394,6 +410,7 @@ export default function Home() {
               walls={walls}
               insulation={insulation}
               trim={trim}
+              window={window}
             />
             <Steps
               onstepChange={handleStepChange}
