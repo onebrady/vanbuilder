@@ -381,12 +381,11 @@ export default function Home() {
             )}
 
             {walls?.image && <OverlayImages vanimage={walls.image?.url} />}
-
+            {window?.image && <OverlayImages vanimage={window.image?.url} />}
             {trim?.image && <OverlayImages vanimage={trim.image?.url} />}
             {powerSystem?.image && (
               <OverlayImages vanimage={powerSystem.image?.url} />
             )}
-            {window?.image && <OverlayImages vanimage={window.image?.url} />}
           </>
         )}
       </div>
